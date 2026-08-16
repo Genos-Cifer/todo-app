@@ -27,12 +27,18 @@ html,body,#root{height:100%;background:var(--color-bg)}
   --color-text-secondary:#a09cb5;
   --color-text-tertiary:#8783a0;
 
-  /* Accent / status */
+  /* Accent / status
+     "-rgb" variants hold the same color as an "r,g,b" triplet so glows/shadows
+     elsewhere can do rgba(var(--color-accent-rgb), alpha) and stay in sync when
+     a theme swaps the accent hue (see styles/themes.css). */
   --color-accent:#a78bfa;
   --color-accent-light:#c4b5fd;
   --color-accent-dark:#7c3aed;
+  --color-accent-rgb:167,139,250;
   --color-danger:#f87171;
+  --color-danger-rgb:248,113,113;
   --color-success:#34d399;
+  --color-success-rgb:52,211,153;
 
   /* Shape & motion */
   --radius-lg:14px;

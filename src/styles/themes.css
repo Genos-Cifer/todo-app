@@ -1,0 +1,65 @@
+/*
+ * Theme variable overrides. `:root` in index.css defines the "Midnight"
+ * defaults; each block below overrides just the tokens that change for that
+ * theme. Applied via `<html data-theme="…">` (see hooks/useTheme.js).
+ *
+ * Priority colors (constants/priorities.js) are intentionally NOT themed —
+ * "Very High/High/Medium/Low" carry the same meaning in every theme.
+ */
+
+/* Ocean — dark surfaces (same as Midnight), sky-blue accent. */
+:root[data-theme="ocean"]{
+  --color-accent:#38bdf8;
+  --color-accent-light:#7dd3fc;
+  --color-accent-dark:#0284c7;
+  --color-accent-rgb:56,189,248;
+}
+
+/* Forest — dark surfaces, green accent. */
+:root[data-theme="forest"]{
+  --color-accent:#4ade80;
+  --color-accent-light:#86efac;
+  --color-accent-dark:#16a34a;
+  --color-accent-rgb:74,222,128;
+}
+
+/* Sunset — dark surfaces, rose accent. */
+:root[data-theme="sunset"]{
+  --color-accent:#fb7185;
+  --color-accent-light:#fda4af;
+  --color-accent-dark:#e11d48;
+  --color-accent-rgb:251,113,133;
+}
+
+/* Daylight — the one light theme. Every surface/text/border token is
+   overridden since light mode inverts the whole surface ramp. */
+:root[data-theme="daylight"]{
+  --color-bg:#f4f4f8;
+  --color-bg-alt:#ffffff;
+  --color-bg-inset:#eef0f5;
+  --color-surface-1:#ffffff;
+  --color-surface-2:#f1f2f7;
+  --color-surface-3:#e3e5ee;
+  --color-surface-4:#d0d3e0;
+
+  --color-border-subtle:rgba(20,20,40,0.06);
+  --color-border-default:rgba(20,20,40,0.12);
+  --color-border-strong:rgba(20,20,40,0.22);
+  --color-border-interactive:#8b87a3;
+
+  --color-text-primary:#1c1c26;
+  --color-text-secondary:#514e66;
+  --color-text-tertiary:#726d8a;
+
+  --color-accent:#7c3aed;
+  --color-accent-light:#a78bfa;
+  --color-accent-dark:#5b21b6;
+  --color-accent-rgb:124,58,237;
+  --color-danger:#dc2626;
+  --color-danger-rgb:220,38,38;
+  --color-success:#059669;
+  --color-success-rgb:5,150,105;
+
+  --shadow-sm:0 4px 24px rgba(15,15,35,0.08);
+  --shadow-lg:0 12px 48px rgba(15,15,35,0.16);
+}

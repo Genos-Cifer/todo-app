@@ -3,6 +3,7 @@ import { generateId } from "./utils/id";
 import { loadState, saveState } from "./utils/storage";
 import { sortAndFilterTasks } from "./utils/tasks";
 import { useToast } from "./hooks/useToast";
+import { useTheme } from "./hooks/useTheme";
 import { useEscapeKey } from "./hooks/useEscapeKey";
 import { Sidebar } from "./components/layout/Sidebar";
 import { Topbar } from "./components/layout/Topbar";
@@ -43,6 +44,7 @@ export default function App() {
     return { y: now.getFullYear(), m: now.getMonth() };
   });
   const { toastMessage, showToast } = useToast();
+  const [theme, setTheme] = useTheme();
 
   useEffect(() => { saveState({ tasks, tags }); }, [tasks, tags]);
 
@@ -166,6 +168,8 @@ export default function App() {
             onNewTask={openNewTaskModal}
             showClearCompleted={view === "done" && completedTasks.length > 0}
             onClearCompleted={() => setConfirmDeleteId("__all__")}
+            theme={theme}
+            onThemeChange={setTheme}
           />
 
           {showSortBar && <SortBar sortBy={sortBy} onSortChange={setSortBy} />}

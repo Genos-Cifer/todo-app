@@ -1,4 +1,5 @@
 import { PRIORITY_COLORS } from "../../constants/priorities";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 import "./Topbar.css";
 
 export function Topbar({
@@ -17,6 +18,8 @@ export function Topbar({
   onNewTask,
   showClearCompleted,
   onClearCompleted,
+  theme,
+  onThemeChange,
 }) {
   return (
     <div className="topbar">
@@ -33,6 +36,7 @@ export function Topbar({
         )}
       </div>
       <div className="topbar__right">
+        <ThemeSwitcher theme={theme} onChange={onThemeChange} />
         {hasActiveFilters && (
           <div className="active-filters">
             {filterPriorities.map(p => (
@@ -52,7 +56,7 @@ export function Topbar({
         )}
         {showNewTaskButton && <button className="btn-new-task" onClick={onNewTask}>+ New task</button>}
         {showClearCompleted && (
-          <button className="btn-secondary" style={{ borderColor: "rgba(248,113,113,0.3)", color: "var(--color-danger)" }} onClick={onClearCompleted}>🗑 Clear completed</button>
+          <button className="btn-secondary" style={{ borderColor: "rgba(var(--color-danger-rgb),0.3)", color: "var(--color-danger)" }} onClick={onClearCompleted}>🗑 Clear completed</button>
         )}
       </div>
     </div>
