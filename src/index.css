@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{height:100%;background:var(--color-bg)}
+
+:root{
+  /* Surfaces */
+  --color-bg:#0f0f14;
+  --color-bg-alt:#15151d;
+  --color-bg-inset:#1a1a25;
+  --color-surface-1:#1f1f2e;
+  --color-surface-2:#272738;
+  --color-surface-3:#2f2f42;
+  --color-surface-4:#383850;
+
+  /* Borders */
+  --color-border-subtle:rgba(255,255,255,0.07);
+  --color-border-default:rgba(255,255,255,0.14);
+  --color-border-strong:rgba(255,255,255,0.24);
+  /* Solid (non-alpha) border for controls that must stay visible regardless of
+     what surface they sit on — e.g. checkboxes that appear on both card and
+     inset backgrounds. Meets ~3:1 contrast against --color-surface-1/--color-bg-inset. */
+  --color-border-interactive:#6f6b88;
+
+  /* Text */
+  --color-text-primary:#f0eef8;
+  --color-text-secondary:#a09cb5;
+  --color-text-tertiary:#8783a0;
+
+  /* Accent / status */
+  --color-accent:#a78bfa;
+  --color-accent-light:#c4b5fd;
+  --color-accent-dark:#7c3aed;
+  --color-danger:#f87171;
+  --color-success:#34d399;
+
+  /* Shape & motion */
+  --radius-lg:14px;
+  --radius-md:10px;
+  --radius-sm:6px;
+  --shadow-sm:0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg:0 12px 48px rgba(0,0,0,0.6);
+  --transition-base:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Shared entrance animations reused across several components. */
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
