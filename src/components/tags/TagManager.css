@@ -1,0 +1,15 @@
+.tag-manager{display:flex;flex-direction:column;gap:10px}
+
+.tag-form{background:var(--color-surface-1);border:1px solid var(--color-border-subtle);border-radius:var(--radius-lg);padding:18px}
+.tag-form h3{font-size:14px;font-weight:700;margin-bottom:16px;letter-spacing:-0.3px}
+.tag-form__color-dots{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.tag-form__color-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;transition:all var(--transition-base);border:3px solid transparent}
+.tag-form__color-dot:hover{transform:scale(1.2)}
+.tag-form__color-dot--selected{border-color:var(--color-text-primary);box-shadow:0 0 0 2px var(--color-bg),0 0 0 4px var(--color-text-primary)}
+
+.tag-row{display:flex;align-items:center;gap:11px;background:var(--color-surface-1);border:1px solid var(--color-border-subtle);border-radius:var(--radius-md);padding:12px 16px;transition:all var(--transition-base);animation:fadeUp 0.25s ease both}
+.tag-row:hover{border-color:var(--color-border-default);box-shadow:var(--shadow-sm);transform:translateY(-1px)}
+.tag-row__dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.tag-row__name{flex:1;font-size:13px;font-weight:500}
+
+.tag-preview-pill{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px}
