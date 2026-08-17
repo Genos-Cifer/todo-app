@@ -1,5 +1,6 @@
 import { PRIORITY_COLORS } from "../../constants/priorities";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { ProfileMenu } from "./ProfileMenu";
 import "./Topbar.css";
 
 export function Topbar({
@@ -20,6 +21,10 @@ export function Topbar({
   onClearCompleted,
   theme,
   onThemeChange,
+  username,
+  email,
+  avatarUrl,
+  onSignOut,
 }) {
   return (
     <div className="topbar">
@@ -58,6 +63,7 @@ export function Topbar({
         {showClearCompleted && (
           <button className="btn-secondary" style={{ borderColor: "rgba(var(--color-danger-rgb),0.3)", color: "var(--color-danger)" }} onClick={onClearCompleted}>🗑 Clear completed</button>
         )}
+        <ProfileMenu username={username} email={email} avatarUrl={avatarUrl} onSignOut={onSignOut} />
       </div>
     </div>
   );

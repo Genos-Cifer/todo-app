@@ -1,0 +1,6 @@
+.username-setup{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--color-bg);padding:24px}
+.username-setup__card{width:100%;max-width:380px;background:var(--color-surface-1);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);padding:36px 30px;box-shadow:var(--shadow-sm);text-align:center}
+.username-setup__icon{font-size:32px;margin-bottom:10px}
+.username-setup__title{font-size:19px;font-weight:700;color:var(--color-text-primary);letter-spacing:-0.3px;margin-bottom:8px}
+.username-setup__subtitle{font-size:12.5px;color:var(--color-text-secondary);line-height:1.7;margin-bottom:22px}
+.username-setup__error{margin-bottom:14px;padding:9px 12px;border-radius:var(--radius-sm);background:rgba(var(--color-danger-rgb),0.1);border:1px solid rgba(var(--color-danger-rgb),0.25);color:var(--color-danger);font-size:12px;font-weight:500;text-align:left}
