@@ -1,5 +1,4 @@
-// Bump this key whenever the persisted shape changes in a breaking way.
-export const STORAGE_KEY = "todo_mgr_v12";
-
-// Separate key for the user's chosen theme — unrelated to the task/tag data shape above.
+// localStorage key for the user's chosen theme. Tasks/tags live in Supabase
+// (see src/services/), not localStorage — this is the one thing still
+// persisted client-side.
 export const THEME_STORAGE_KEY = "todo_mgr_theme_v1";
