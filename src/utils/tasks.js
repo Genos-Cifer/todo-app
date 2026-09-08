@@ -12,9 +12,17 @@ export function sortAndFilterTasks(tasks, { filterPriorities = [], filterTags = 
   }
 
   if (sortBy === "due") {
-    result.sort((a, b) => ((a.due || "9999") < (b.due || "9999") ? -1 : 1));
+    result.sort((a, b) => {
+      const aDue = a.due || "9999-12-31";
+      const bDue = b.due || "9999-12-31";
+      return aDue.localeCompare(bDue);
+    });
   } else if (sortBy === "priority") {
-    result.sort((a, b) => PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority));
+    result.sort((a, b) => {
+      const aPriorityIndex = PRIORITIES.indexOf(a.priority);
+      const bPriorityIndex = PRIORITIES.indexOf(b.priority);
+      return (aPriorityIndex === -1 ? PRIORITIES.length : aPriorityIndex) - (bPriorityIndex === -1 ? PRIORITIES.length : bPriorityIndex);
+    });
   } else {
     result.sort((a, b) => b.created - a.created);
   }
