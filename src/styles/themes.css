@@ -1,65 +1,68 @@
 /*
- * Theme variable overrides. `:root` in index.css defines the "Midnight"
- * defaults; each block below overrides just the tokens that change for that
- * theme. Applied via `<html data-theme="…">` (see hooks/useTheme.js).
+ * Palettes. Each one sets only hue/saturation knobs — every --color-* token is
+ * derived from these in index.css, so a palette repaints surfaces, borders,
+ * text, shadows and the ambient glow, not just the accent.
  *
- * Priority colors (constants/priorities.js) are intentionally NOT themed —
- * "Very High/High/Medium/Low" carry the same meaning in every theme.
+ * Light vs dark is a SEPARATE axis ([data-mode], also in index.css), so every
+ * palette below works in both modes. Palettes must never override a --l-*
+ * mode knob: themes.css loads after index.css at equal specificity, so it
+ * would beat the light-mode ramp. Use --accent-l-shift for accent brightness.
+ *
+ * Selectors are deliberately NOT :root-scoped, so the theme picker can put
+ * data-theme on a swatch element and have it derive that palette's real
+ * colors instead of duplicating hex values in JS.
+ *
+ * Accent hues are kept at least ~30° away from every priority hue (red 0,
+ * orange 25, amber 43, green 160) so a priority badge can never be mistaken
+ * for accent chrome. Where a palette's own accent would crowd one, that
+ * priority's hue is nudged aside here rather than the accent being abandoned.
  */
 
-/* Ocean — dark surfaces (same as Midnight), sky-blue accent. */
-:root[data-theme="ocean"]{
-  --color-accent:#38bdf8;
-  --color-accent-light:#7dd3fc;
-  --color-accent-dark:#0284c7;
-  --color-accent-rgb:56,189,248;
+/* Midnight — violet. The default; matches the :root values in index.css. */
+[data-theme="midnight"]{
+  --h:258;
+  --sat-surface:24%;
+  --sat-text:16%;
+  --accent-h:262;
+  --accent-s:92%;
+  /* Declared even though it is the default: the picker nests data-theme on
+     its swatches, which would otherwise inherit the active palette’s shift. */
+  --accent-l-shift:0%;
 }
 
-/* Forest — dark surfaces, green accent. */
-:root[data-theme="forest"]{
-  --color-accent:#4ade80;
-  --color-accent-light:#86efac;
-  --color-accent-dark:#16a34a;
-  --color-accent-rgb:74,222,128;
+/* Ocean — deep navy surfaces, sky-blue accent. */
+[data-theme="ocean"]{
+  --h:212;
+  --sat-surface:36%;
+  --sat-text:20%;
+  --accent-h:199;
+  --accent-s:90%;
+  --accent-l-shift:-4%;
 }
 
-/* Sunset — dark surfaces, rose accent. */
-:root[data-theme="sunset"]{
-  --color-accent:#fb7185;
-  --color-accent-light:#fda4af;
-  --color-accent-dark:#e11d48;
-  --color-accent-rgb:251,113,133;
+/* Forest — dark pine surfaces, spring-green accent.
+   Accent 128° would sit only 32° from the default "Low" green, so Low is
+   nudged to a cooler teal-emerald to keep the two clearly apart. */
+[data-theme="forest"]{
+  --h:152;
+  --sat-surface:27%;
+  --sat-text:14%;
+  --accent-h:128;
+  --accent-s:64%;
+  --accent-l-shift:-6%;
+  --priority-low-h:172;
 }
 
-/* Daylight — the one light theme. Every surface/text/border token is
-   overridden since light mode inverts the whole surface ramp. */
-:root[data-theme="daylight"]{
-  --color-bg:#f4f4f8;
-  --color-bg-alt:#ffffff;
-  --color-bg-inset:#eef0f5;
-  --color-surface-1:#ffffff;
-  --color-surface-2:#f1f2f7;
-  --color-surface-3:#e3e5ee;
-  --color-surface-4:#d0d3e0;
-
-  --color-border-subtle:rgba(20,20,40,0.06);
-  --color-border-default:rgba(20,20,40,0.12);
-  --color-border-strong:rgba(20,20,40,0.22);
-  --color-border-interactive:#8b87a3;
-
-  --color-text-primary:#1c1c26;
-  --color-text-secondary:#514e66;
-  --color-text-tertiary:#726d8a;
-
-  --color-accent:#7c3aed;
-  --color-accent-light:#a78bfa;
-  --color-accent-dark:#5b21b6;
-  --color-accent-rgb:124,58,237;
-  --color-danger:#dc2626;
-  --color-danger-rgb:220,38,38;
-  --color-success:#059669;
-  --color-success-rgb:5,150,105;
-
-  --shadow-sm:0 4px 24px rgba(15,15,35,0.08);
-  --shadow-lg:0 12px 48px rgba(15,15,35,0.16);
+/* Sunset — warm plum surfaces, fuchsia accent.
+   The old rose accent (#fb7185) was nearly identical to the "Very High"
+   priority red; fuchsia clears it, and Very High warms slightly to widen the
+   gap further. */
+[data-theme="sunset"]{
+  --h:330;
+  --sat-surface:26%;
+  --sat-text:16%;
+  --accent-h:322;
+  --accent-s:82%;
+  --accent-l-shift:-3%;
+  --priority-very-high-h:6;
 }

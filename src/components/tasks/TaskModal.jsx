@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PRIORITIES, PRIORITY_COLORS } from "../../constants/priorities";
+import { PRIORITIES, PRIORITY_COLORS, withAlpha } from "../../constants/priorities";
 import "../../styles/shared.css";
 
 // Create/edit form for a task. Pass `task` to edit, omit it to create a new one.
@@ -42,7 +42,7 @@ export function TaskModal({ task, tags, defaultBacklog, onSave, onCancel }) {
               <button
                 key={p}
                 className={`priority-option${priority === p ? " priority-option--selected" : ""}`}
-                style={priority === p ? { borderColor: PRIORITY_COLORS[p], background: PRIORITY_COLORS[p] } : { borderColor: PRIORITY_COLORS[p] + "80", color: PRIORITY_COLORS[p] }}
+                style={priority === p ? { borderColor: PRIORITY_COLORS[p], background: PRIORITY_COLORS[p] } : { borderColor: withAlpha(PRIORITY_COLORS[p], 50), color: PRIORITY_COLORS[p] }}
                 onClick={() => setPriority(p)}
               >
                 {p}
@@ -65,9 +65,9 @@ export function TaskModal({ task, tags, defaultBacklog, onSave, onCancel }) {
               {tags.map(tag => (
                 <button
                   key={tag.id}
-                  className="tag-pill"
+                  className={`tag-pill tag-chip tag-chip--button${selectedTagIds.includes(tag.id) ? " tag-chip--on" : ""}`}
                   onClick={() => toggleTag(tag.id)}
-                  style={{ borderColor: tag.color, color: tag.color, background: selectedTagIds.includes(tag.id) ? tag.color + "33" : "transparent" }}
+                  style={{ "--tag-color": tag.color }}
                 >
                   {selectedTagIds.includes(tag.id) && "✓ "}{tag.name}
                 </button>

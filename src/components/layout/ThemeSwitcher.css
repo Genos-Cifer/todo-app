@@ -1,7 +1,28 @@
 .theme-switcher{position:relative;display:inline-flex;align-items:center;flex-shrink:0}
-.theme-switcher::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;font-size:10px;color:var(--color-text-tertiary)}
 
-.theme-switcher__select{appearance:none;-webkit-appearance:none;-moz-appearance:none;padding:7px 28px 7px 12px;font-size:12px;font-weight:600;border-radius:10px;border:1px solid var(--color-border-default);background:var(--color-surface-1);color:var(--color-text-secondary);cursor:pointer;font-family:inherit;transition:all var(--transition-base)}
-.theme-switcher__select:hover{border-color:var(--color-border-strong);color:var(--color-text-primary)}
-.theme-switcher__select:focus{outline:none;border-color:var(--color-accent);box-shadow:0 0 0 3px rgba(var(--color-accent-rgb),0.15)}
-.theme-switcher__select option{background:var(--color-surface-2);color:var(--color-text-primary)}
+.theme-switcher__trigger{display:flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border-radius:10px;border:1px solid var(--color-border-default);background:var(--color-surface-1);cursor:pointer;transition:all var(--transition-base)}
+.theme-switcher__trigger:hover{border-color:var(--color-border-strong)}
+.theme-switcher__trigger:active{transform:scale(0.95)}
+
+/* The swatch derives from whichever palette its own data-theme names — the
+   surface lightness still comes from the active mode, so previews follow
+   light/dark too. Keep these formulas in step with src/index.css. */
+.theme-swatch{position:relative;display:block;width:18px;height:18px;border-radius:6px;overflow:hidden;background:hsl(var(--h) var(--sat-surface) var(--l-surface-1));box-shadow:inset 0 0 0 1px var(--color-border-strong)}
+.theme-swatch__chip{position:absolute;right:-3px;bottom:-3px;width:13px;height:13px;border-radius:50%;background:hsl(var(--accent-h) var(--accent-s) calc(var(--l-accent-base) + var(--accent-l-shift)))}
+.theme-swatch--trigger{width:17px;height:17px}
+
+.theme-switcher__panel{position:absolute;top:calc(100% + 10px);right:0;width:210px;background:var(--color-surface-1);border:1px solid var(--color-border-default);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:12px;z-index:150;animation:modalUp 0.18s cubic-bezier(0.4,0,0.2,1)}
+
+.theme-switcher__label{font-size:9px;font-weight:700;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+.theme-switcher__palettes{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:14px}
+
+.theme-swatch-btn{display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:var(--radius-sm);border:1px solid transparent;background:transparent;cursor:pointer;font-family:inherit;transition:all var(--transition-base);text-align:left}
+.theme-swatch-btn:hover{background:var(--color-surface-2)}
+.theme-swatch-btn--active{border-color:var(--color-accent);background:color-mix(in srgb, var(--color-accent) 10%, transparent)}
+.theme-swatch-btn__label{font-size:11px;font-weight:600;color:var(--color-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.theme-swatch-btn--active .theme-swatch-btn__label{color:var(--color-text-primary)}
+
+.theme-switcher__modes{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--color-bg-inset);border-radius:9px;padding:3px}
+.theme-mode-btn{padding:6px 4px;font-size:10.5px;font-weight:600;border-radius:6px;border:none;background:transparent;color:var(--color-text-tertiary);cursor:pointer;font-family:inherit;transition:all var(--transition-base);white-space:nowrap}
+.theme-mode-btn:hover{color:var(--color-text-primary)}
+.theme-mode-btn--active{background:var(--color-accent);color:#fff}

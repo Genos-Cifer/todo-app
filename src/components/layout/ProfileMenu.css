@@ -17,4 +17,10 @@
 .profile-menu__divider{height:1px;background:var(--color-border-subtle);margin:12px 0}
 
 .profile-menu__logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;font-size:12.5px;font-weight:600;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--color-danger);cursor:pointer;transition:background var(--transition-base);font-family:inherit}
-.profile-menu__logout:hover{background:rgba(var(--color-danger-rgb),0.1)}
+.profile-menu__logout:hover{background:color-mix(in srgb, var(--color-danger) 10%, transparent)}
+
+.profile-menu__action{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;font-size:12.5px;font-weight:600;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:background var(--transition-base);font-family:inherit}
+.profile-menu__action:hover{background:var(--color-surface-2);color:var(--color-text-primary)}
+.profile-menu__action-label{flex:1;text-align:left}
+.profile-menu__status{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 7px;border-radius:20px;background:var(--color-surface-3);color:var(--color-text-tertiary)}
+.profile-menu__status--on{background:color-mix(in srgb, var(--color-success) 16%, transparent);color:var(--color-success)}

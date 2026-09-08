@@ -1,9 +1,17 @@
 import { PRIORITIES } from "../constants/priorities";
+import { searchTasks } from "./search";
 
-// Applies active priority/tag filters and the selected sort order to a task list.
-export function sortAndFilterTasks(tasks, { filterPriorities = [], filterTags = [], sortBy = "created" } = {}) {
+// Applies the search query, active priority/tag filters, and the selected sort
+// order to a task list.
+export function sortAndFilterTasks(
+  tasks,
+  { filterPriorities = [], filterTags = [], sortBy = "created", searchQuery = "", allTags = [] } = {}
+) {
   let result = [...tasks];
 
+  if (searchQuery.trim()) {
+    result = searchTasks(result, searchQuery, allTags);
+  }
   if (filterPriorities.length) {
     result = result.filter(task => filterPriorities.includes(task.priority));
   }
