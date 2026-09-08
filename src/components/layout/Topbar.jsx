@@ -1,6 +1,7 @@
-import { PRIORITY_COLORS } from "../../constants/priorities";
+import { PRIORITY_COLORS, withAlpha } from "../../constants/priorities";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { ProfileMenu } from "./ProfileMenu";
+import { SearchBar } from "./SearchBar";
 import "./Topbar.css";
 
 export function Topbar({
@@ -19,12 +20,21 @@ export function Topbar({
   onNewTask,
   showClearCompleted,
   onClearCompleted,
-  theme,
-  onThemeChange,
+  palette,
+  onPaletteChange,
+  mode,
+  onModeChange,
   username,
   email,
   avatarUrl,
   onSignOut,
+  searchQuery,
+  onSearchChange,
+  searchResultCount,
+  showSearch,
+  onOpenPalette,
+  onOpenNotifications,
+  notificationsActive,
 }) {
   return (
     <div className="topbar">
@@ -41,18 +51,23 @@ export function Topbar({
         )}
       </div>
       <div className="topbar__right">
-        <ThemeSwitcher theme={theme} onChange={onThemeChange} />
+        {showSearch && <SearchBar value={searchQuery} onChange={onSearchChange} resultCount={searchResultCount} />}
+
+        <button className="palette-trigger" onClick={onOpenPalette} title="Open command palette">
+          <span aria-hidden="true">⌘</span>K
+        </button>
+
         {hasActiveFilters && (
           <div className="active-filters">
             {filterPriorities.map(p => (
-              <span key={p} className="active-filter-pill" style={{ color: PRIORITY_COLORS[p], borderColor: PRIORITY_COLORS[p] + "66" }}>
+              <span key={p} className="active-filter-pill" style={{ color: PRIORITY_COLORS[p], borderColor: withAlpha(PRIORITY_COLORS[p], 40) }}>
                 {p}<button onClick={() => onTogglePriorityFilter(p)}>✕</button>
               </span>
             ))}
             {filterTags.map(id => {
               const tag = tags.find(t => t.id === id);
               return tag ? (
-                <span key={id} className="active-filter-pill" style={{ color: tag.color, borderColor: tag.color + "66" }}>
+                <span key={id} className="active-filter-pill tag-chip" style={{ "--tag-color": tag.color }}>
                   {tag.name}<button onClick={() => onToggleTagFilter(id)}>✕</button>
                 </span>
               ) : null;
@@ -61,9 +76,17 @@ export function Topbar({
         )}
         {showNewTaskButton && <button className="btn-new-task" onClick={onNewTask}>+ New task</button>}
         {showClearCompleted && (
-          <button className="btn-secondary" style={{ borderColor: "rgba(var(--color-danger-rgb),0.3)", color: "var(--color-danger)" }} onClick={onClearCompleted}>🗑 Clear completed</button>
+          <button className="btn-secondary" style={{ borderColor: "color-mix(in srgb, var(--color-danger) 30%, transparent)", color: "var(--color-danger)" }} onClick={onClearCompleted}>🗑 Clear completed</button>
         )}
-        <ProfileMenu username={username} email={email} avatarUrl={avatarUrl} onSignOut={onSignOut} />
+        <ThemeSwitcher palette={palette} onPaletteChange={onPaletteChange} mode={mode} onModeChange={onModeChange} />
+        <ProfileMenu
+          username={username}
+          email={email}
+          avatarUrl={avatarUrl}
+          onSignOut={onSignOut}
+          onOpenNotifications={onOpenNotifications}
+          notificationsActive={notificationsActive}
+        />
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { getRandomQuote } from "../constants/quotes";
 import "./LoginPage.css";
 
 const FEATURES = [
@@ -8,6 +10,10 @@ const FEATURES = [
 ];
 
 export function LoginPage({ onSignIn, isSigningIn, error }) {
+  // Picked once per mount so the quote stays put while the page is open,
+  // but is fresh on every visit/reload.
+  const [quote] = useState(getRandomQuote);
+
   return (
     <div className="login-page">
       <div className="login-page__hero">
@@ -34,8 +40,8 @@ export function LoginPage({ onSignIn, isSigningIn, error }) {
         </ul>
         <blockquote className="login-page__quote">
           <span className="login-page__quote-mark">“</span>
-          What gets measured gets managed.
-          <footer className="login-page__quote-author">— Peter Drucker</footer>
+          {quote.text}
+          <footer className="login-page__quote-author">— {quote.author}</footer>
         </blockquote>
       </div>
 

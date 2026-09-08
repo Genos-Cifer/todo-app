@@ -24,7 +24,7 @@
 .field{margin-bottom:16px}
 .field-label{display:block;font-size:10px;font-weight:700;color:var(--color-text-tertiary);margin-bottom:6px;letter-spacing:0.8px;text-transform:uppercase}
 .field input,.field select,.field textarea{width:100%;padding:10px 14px;font-size:13px;border:1px solid var(--color-border-default);border-radius:var(--radius-md);background:var(--color-surface-1);color:var(--color-text-primary);outline:none;transition:all var(--transition-base);font-family:inherit}
-.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--color-accent);box-shadow:0 0 0 4px rgba(var(--color-accent-rgb),0.1)}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--color-accent);box-shadow:0 0 0 4px color-mix(in srgb, var(--color-accent) 10%, transparent)}
 .field input::placeholder,.field textarea::placeholder{color:var(--color-text-tertiary)}
 .field select option{background:var(--color-surface-2)}
 .field textarea{resize:vertical;min-height:68px;line-height:1.6}
@@ -49,18 +49,36 @@
 .btn-secondary{padding:8px 16px;font-size:12px;font-weight:600;border-radius:12px;border:1px solid var(--color-border-default);background:transparent;color:var(--color-text-secondary);cursor:pointer;transition:all var(--transition-base);font-family:inherit}
 .btn-secondary:hover{background:var(--color-surface-1);color:var(--color-text-primary)}
 
-.btn-primary{padding:8px 22px;font-size:12px;font-weight:600;border-radius:12px;border:none;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-dark));color:#fff;cursor:pointer;transition:all var(--transition-base);font-family:inherit;box-shadow:0 2px 10px rgba(var(--color-accent-rgb),0.2)}
-.btn-primary:hover{box-shadow:0 4px 16px rgba(var(--color-accent-rgb),0.35)}
+.btn-primary{padding:8px 22px;font-size:12px;font-weight:600;border-radius:12px;border:none;background:linear-gradient(135deg,var(--color-accent),var(--color-accent-dark));color:#fff;cursor:pointer;transition:all var(--transition-base);font-family:inherit;box-shadow:0 2px 10px color-mix(in srgb, var(--color-accent) 20%, transparent)}
+.btn-primary:hover{box-shadow:0 4px 16px color-mix(in srgb, var(--color-accent) 35%, transparent)}
 .btn-primary:active{transform:scale(0.96)}
 .btn-primary:disabled{opacity:0.25;cursor:not-allowed;box-shadow:none}
 
 .btn-danger{padding:8px 22px;font-size:12px;font-weight:600;border-radius:12px;border:none;background:linear-gradient(135deg,#f87171,#dc2626);color:#fff;cursor:pointer;transition:all var(--transition-base);font-family:inherit}
-.btn-danger:hover{box-shadow:0 4px 16px rgba(var(--color-danger-rgb),0.3)}
+.btn-danger:hover{box-shadow:0 4px 16px color-mix(in srgb, var(--color-danger) 30%, transparent)}
 
 /* Generic icon-only action button (edit / delete / expand …) */
 .icon-btn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;border:none;background:transparent;color:var(--color-text-tertiary);cursor:pointer;font-size:14px;transition:all var(--transition-base)}
 .icon-btn:hover{background:var(--color-surface-2);color:var(--color-text-primary)}
 .icon-btn:active{transform:scale(0.85)}
-.icon-btn--danger:hover{background:rgba(var(--color-danger-rgb),0.1);color:var(--color-danger)}
+.icon-btn--danger:hover{background:color-mix(in srgb, var(--color-danger) 10%, transparent);color:var(--color-danger)}
 .icon-btn--ghost{background:transparent}
 .icon-btn--small{width:24px;height:24px;font-size:12px}
+
+/* Tag chips ────────────────────────────────────────────────────────────────
+   A tag's color is user-chosen and stored as literal hex picked against dark
+   surfaces, so it can't just be used as ink in light mode (pale yellow on
+   white is unreadable). The color arrives as --tag-color and background, ink
+   and border are all derived from it; the mix percentages live in index.css
+   per mode, so light mode darkens the ink automatically. */
+.tag-chip{
+  background:color-mix(in srgb, var(--tag-color) var(--tag-bg-pct), transparent);
+  color:color-mix(in srgb, var(--tag-color) var(--tag-ink-pct), var(--tag-ink-base));
+  border:1px solid color-mix(in srgb, var(--tag-color) var(--tag-border-pct), transparent);
+}
+/* Toggleable variant used in the tag pickers. */
+.tag-chip--button{
+  border:2px solid color-mix(in srgb, var(--tag-color) 70%, transparent);
+  background:transparent;
+}
+.tag-chip--on{background:color-mix(in srgb, var(--tag-color) 24%, transparent)}

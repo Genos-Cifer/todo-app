@@ -1,9 +1,17 @@
 import { PRIORITIES } from "../constants/priorities";
+import { searchTasks } from "./search";
 
-// Applies active priority/tag filters and the selected sort order to a task list.
-export function sortAndFilterTasks(tasks, { filterPriorities = [], filterTags = [], sortBy = "created" } = {}) {
+// Applies the search query, active priority/tag filters, and the selected sort
+// order to a task list.
+export function sortAndFilterTasks(
+  tasks,
+  { filterPriorities = [], filterTags = [], sortBy = "created", searchQuery = "", allTags = [] } = {}
+) {
   let result = [...tasks];
 
+  if (searchQuery.trim()) {
+    result = searchTasks(result, searchQuery, allTags);
+  }
   if (filterPriorities.length) {
     result = result.filter(task => filterPriorities.includes(task.priority));
   }
@@ -12,9 +20,17 @@ export function sortAndFilterTasks(tasks, { filterPriorities = [], filterTags = 
   }
 
   if (sortBy === "due") {
-    result.sort((a, b) => ((a.due || "9999") < (b.due || "9999") ? -1 : 1));
+    result.sort((a, b) => {
+      const aDue = a.due || "9999-12-31";
+      const bDue = b.due || "9999-12-31";
+      return aDue.localeCompare(bDue);
+    });
   } else if (sortBy === "priority") {
-    result.sort((a, b) => PRIORITIES.indexOf(a.priority) - PRIORITIES.indexOf(b.priority));
+    result.sort((a, b) => {
+      const aPriorityIndex = PRIORITIES.indexOf(a.priority);
+      const bPriorityIndex = PRIORITIES.indexOf(b.priority);
+      return (aPriorityIndex === -1 ? PRIORITIES.length : aPriorityIndex) - (bPriorityIndex === -1 ? PRIORITIES.length : bPriorityIndex);
+    });
   } else {
     result.sort((a, b) => b.created - a.created);
   }

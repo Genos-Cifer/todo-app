@@ -2,7 +2,12 @@
   display:flex;
   height:100vh;
   overflow:hidden;
-  background:var(--color-bg);
+  /* Ambient accent wash over the base background. Without it a palette only
+     shows up on accent-colored controls; with it the whole shell carries the
+     theme's hue. Strength is per-mode (--app-glow-pct in index.css). */
+  background:
+    radial-gradient(120% 90% at 12% 0%, color-mix(in srgb, var(--color-accent) var(--app-glow-pct), transparent), transparent 62%),
+    var(--color-bg);
   font-family:'Inter',system-ui,sans-serif;
   color:var(--color-text-primary);
 }

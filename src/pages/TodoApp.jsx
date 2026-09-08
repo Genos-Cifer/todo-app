@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { sortAndFilterTasks } from "../utils/tasks";
+import { searchTasks } from "../utils/search";
 import { useToast } from "../hooks/useToast";
 import { useTheme } from "../hooks/useTheme";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useCommandHotkey } from "../hooks/useHotkey";
+import { useNotifications } from "../hooks/useNotifications";
 import * as tasksService from "../services/tasksService";
 import * as tagsService from "../services/tagsService";
 import { Sidebar } from "../components/layout/Sidebar";
@@ -16,6 +19,8 @@ import { CalendarView } from "../components/calendar/CalendarView";
 import { Metrics } from "../components/metrics/Metrics";
 import { Toast } from "../components/common/Toast";
 import { LoadingScreen } from "../components/common/LoadingScreen";
+import { CommandPalette } from "../components/palette/CommandPalette";
+import { NotificationSettings } from "../components/notifications/NotificationSettings";
 import "../App.css";
 
 const ERROR_TOAST = "⚠ Something went wrong — please try again";
@@ -32,16 +37,20 @@ export function TodoApp({ user, profile, onSignOut }) {
   const [filterTags, setFilterTags] = useState([]);
   const [filterPriorities, setFilterPriorities] = useState([]);
   const [sortBy, setSortBy] = useState("created");
+  const [searchQuery, setSearchQuery] = useState("");
   const [modal, setModal] = useState(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [viewMode, setViewMode] = useState("normal");
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [calendarMonth, setCalendarMonth] = useState(() => {
     const now = new Date();
     return { y: now.getFullYear(), m: now.getMonth() };
   });
   const { toastMessage, showToast } = useToast();
-  const [theme, setTheme] = useTheme();
+  const { palette, mode, setPalette, setMode } = useTheme();
+  const notifications = useNotifications(tasks);
 
   useEffect(() => {
     let cancelled = false;
@@ -58,13 +67,18 @@ export function TodoApp({ user, profile, onSignOut }) {
   }, [user.id]);
 
   useEscapeKey(() => {
-    if (confirmDeleteId) setConfirmDeleteId(null);
+    if (paletteOpen) setPaletteOpen(false);
+    else if (notificationsOpen) setNotificationsOpen(false);
+    else if (confirmDeleteId) setConfirmDeleteId(null);
     else if (modal) setModal(null);
   });
 
+  const openPalette = useCallback(() => setPaletteOpen(true), []);
+  useCommandHotkey("k", openPalette);
+
   const togglePriorityFilter = p => setFilterPriorities(list => (list.includes(p) ? list.filter(x => x !== p) : [...list, p]));
   const toggleTagFilter = id => setFilterTags(list => (list.includes(id) ? list.filter(x => x !== id) : [...list, id]));
-  const clearFilters = () => { setFilterPriorities([]); setFilterTags([]); };
+  const clearFilters = () => { setFilterPriorities([]); setFilterTags([]); setSearchQuery(""); };
 
   // Updates a task, auto-completing it when every subtask has just been checked off.
   const handleTaskUpdate = async updatedTask => {
@@ -174,7 +188,15 @@ export function TodoApp({ user, profile, onSignOut }) {
   const completedTasks = tasks.filter(t => t.done && !t.backlog);
   const backlogTasks = tasks.filter(t => t.backlog);
 
-  const visibleTasksFor = list => sortAndFilterTasks(list, { filterPriorities, filterTags, sortBy });
+  const visibleTasksFor = list =>
+    sortAndFilterTasks(list, { filterPriorities, filterTags, sortBy, searchQuery, allTags: tags });
+  // Calendar and the completed list skip the priority/tag filters (they always
+  // have), but search should still narrow what they show.
+  const applySearch = list => (searchQuery.trim() ? searchTasks(list, searchQuery, tags) : list);
+
+  const visibleActive = visibleTasksFor(activeTasks);
+  const visibleBacklog = visibleTasksFor(backlogTasks);
+  const visibleCompleted = applySearch(completedTasks);
 
   const taskPendingDelete = confirmDeleteId ? tasks.find(t => t.id === confirmDeleteId) : null;
   const hasActiveFilters = filterPriorities.length > 0 || filterTags.length > 0;
@@ -188,6 +210,10 @@ export function TodoApp({ user, profile, onSignOut }) {
   ];
   const currentNavItem = navItems.find(item => item.id === view);
   const showSortBar = viewMode === "normal" && (view === "tasks" || view === "backlog");
+  const isTaskView = view === "tasks" || view === "backlog" || view === "done";
+  const searchResultCount =
+    view === "done" ? visibleCompleted.length : view === "backlog" ? visibleBacklog.length : visibleActive.length;
+
   const openNewTaskModal = () => setModal({ mode: "new", backlog: view === "backlog" });
   const openEditTaskModal = task => setModal({ mode: "edit", task });
 
@@ -198,7 +224,45 @@ export function TodoApp({ user, profile, onSignOut }) {
     onMarkDone: handleMarkDone,
   };
 
+  const paletteActions = {
+    onNavigate: id => setView(id),
+    onOpenTask: task => {
+      // Jump to wherever the task actually lives before opening it, so closing
+      // the modal doesn't drop you somewhere the task isn't visible.
+      setView(task.backlog ? "backlog" : task.done ? "done" : "tasks");
+      setViewMode("normal");
+      openEditTaskModal(task);
+    },
+    onNewTask: openNewTaskModal,
+    onCreateTaskWithTitle: title =>
+      handleSaveTask({
+        title,
+        priority: "Medium",
+        due: "",
+        notes: "",
+        tags: [],
+        backlog: view === "backlog",
+        subtasks: [],
+      }),
+    onSetViewMode: setViewMode,
+    onSetSort: setSortBy,
+    onSetPalette: setPalette,
+    onSetMode: setMode,
+    onTogglePriorityFilter: togglePriorityFilter,
+    onToggleTagFilter: toggleTagFilter,
+    onClearFilters: clearFilters,
+    onToggleSidebar: () => setSidebarOpen(o => !o),
+    onOpenNotificationSettings: () => setNotificationsOpen(true),
+    onSignOut,
+  };
+
   if (isDataLoading) return <LoadingScreen label="Loading your tasks…" />;
+
+  const searchEmptyState = {
+    icon: "🔍",
+    title: "No matching tasks",
+    subtitle: `Nothing here matches “${searchQuery.trim()}”. Try a different term, or press ⌘K to search everywhere.`,
+  };
 
   return (
     <>
@@ -235,12 +299,21 @@ export function TodoApp({ user, profile, onSignOut }) {
             onNewTask={openNewTaskModal}
             showClearCompleted={view === "done" && completedTasks.length > 0}
             onClearCompleted={() => setConfirmDeleteId("__all__")}
-            theme={theme}
-            onThemeChange={setTheme}
+            palette={palette}
+            onPaletteChange={setPalette}
+            mode={mode}
+            onModeChange={setMode}
             username={profile.username}
             email={user.email}
             avatarUrl={profile.avatarUrl}
             onSignOut={onSignOut}
+            showSearch={isTaskView}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchResultCount={searchResultCount}
+            onOpenPalette={openPalette}
+            onOpenNotifications={() => setNotificationsOpen(true)}
+            notificationsActive={notifications.active}
           />
 
           {showSortBar && <SortBar sortBy={sortBy} onSortChange={setSortBy} />}
@@ -251,51 +324,71 @@ export function TodoApp({ user, profile, onSignOut }) {
 
             {view === "tasks" && viewMode === "normal" && (
               <TaskList
-                tasks={visibleTasksFor(activeTasks)}
+                tasks={visibleActive}
                 tags={tags}
                 {...taskListHandlers}
-                emptyState={{
-                  icon: "🌙",
-                  title: "All clear!",
-                  subtitle: hasActiveFilters ? "No tasks match your filters. Try adjusting them." : "Your task list is empty. Ready to add something?",
-                  ctaLabel: hasActiveFilters ? null : "+ Create your first task",
-                  onCta: openNewTaskModal,
-                }}
+                emptyState={
+                  searchQuery.trim()
+                    ? searchEmptyState
+                    : {
+                        icon: "🌙",
+                        title: "All clear!",
+                        subtitle: hasActiveFilters ? "No tasks match your filters. Try adjusting them." : "Your task list is empty. Ready to add something?",
+                        ctaLabel: hasActiveFilters ? null : "+ Create your first task",
+                        onCta: openNewTaskModal,
+                      }
+                }
               />
             )}
             {view === "tasks" && viewMode === "calendar" && (
-              <CalendarView tasks={activeTasks} tags={tags} month={calendarMonth} onMonthChange={setCalendarMonth} onEdit={openEditTaskModal} />
+              <CalendarView tasks={applySearch(activeTasks)} tags={tags} month={calendarMonth} onMonthChange={setCalendarMonth} onEdit={openEditTaskModal} />
             )}
 
             {view === "backlog" && viewMode === "normal" && (
               <TaskList
-                tasks={visibleTasksFor(backlogTasks)}
+                tasks={visibleBacklog}
                 tags={tags}
                 {...taskListHandlers}
-                emptyState={{
-                  icon: "📦",
-                  title: "Backlog is empty",
-                  subtitle: hasActiveFilters ? "No backlog tasks match your filters." : "Tasks you park for later will appear here.",
-                  ctaLabel: hasActiveFilters ? null : "+ Add a task",
-                  onCta: openNewTaskModal,
-                }}
+                emptyState={
+                  searchQuery.trim()
+                    ? searchEmptyState
+                    : {
+                        icon: "📦",
+                        title: "Backlog is empty",
+                        subtitle: hasActiveFilters ? "No backlog tasks match your filters." : "Tasks you park for later will appear here.",
+                        ctaLabel: hasActiveFilters ? null : "+ Add a task",
+                        onCta: openNewTaskModal,
+                      }
+                }
               />
             )}
             {view === "backlog" && viewMode === "calendar" && (
-              <CalendarView tasks={backlogTasks} tags={tags} month={calendarMonth} onMonthChange={setCalendarMonth} onEdit={openEditTaskModal} />
+              <CalendarView tasks={applySearch(backlogTasks)} tags={tags} month={calendarMonth} onMonthChange={setCalendarMonth} onEdit={openEditTaskModal} />
             )}
 
             {view === "done" && (
               <TaskList
-                tasks={[...completedTasks].sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0))}
+                tasks={[...visibleCompleted].sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0))}
                 tags={tags}
                 {...taskListHandlers}
-                emptyState={{ icon: "🎯", title: "Nothing completed yet", subtitle: "Finished tasks will show up here." }}
+                emptyState={
+                  searchQuery.trim()
+                    ? searchEmptyState
+                    : { icon: "🎯", title: "Nothing completed yet", subtitle: "Finished tasks will show up here." }
+                }
               />
             )}
           </div>
         </div>
       </div>
+
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        tasks={tasks}
+        tags={tags}
+        actions={paletteActions}
+      />
 
       {modal && (
         <div className="overlay" onClick={e => e.target === e.currentTarget && setModal(null)}>
@@ -305,6 +398,21 @@ export function TodoApp({ user, profile, onSignOut }) {
             defaultBacklog={modal.backlog}
             onSave={taskData => { handleSaveTask(taskData); setModal(null); }}
             onCancel={() => setModal(null)}
+          />
+        </div>
+      )}
+
+      {notificationsOpen && (
+        <div className="overlay" onClick={e => e.target === e.currentTarget && setNotificationsOpen(false)}>
+          <NotificationSettings
+            supported={notifications.supported}
+            permission={notifications.permission}
+            settings={notifications.settings}
+            active={notifications.active}
+            onEnable={notifications.enable}
+            onDisable={notifications.disable}
+            onDigestHourChange={notifications.setDigestHour}
+            onClose={() => setNotificationsOpen(false)}
           />
         </div>
       )}

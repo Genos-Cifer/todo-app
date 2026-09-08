@@ -40,7 +40,7 @@ export function TagManager({ tags, onCreate, onUpdate, onDelete }) {
         </div>
         {name.trim() && (
           <div style={{ marginTop: 12 }}>
-            <span className="tag-preview-pill" style={{ background: color + "33", color, border: `1px solid ${color}80` }}>{name}</span>
+            <span className="tag-preview-pill tag-chip" style={{ "--tag-color": color }}>{name}</span>
           </div>
         )}
         <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
@@ -55,7 +55,7 @@ export function TagManager({ tags, onCreate, onUpdate, onDelete }) {
           <div key={tag.id} className="tag-row">
             <div className="tag-row__dot" style={{ background: tag.color }} />
             <span className="tag-row__name">{tag.name}</span>
-            <span className="tag-preview-pill" style={{ background: tag.color + "26", color: tag.color, border: `1px solid ${tag.color}66` }}>{tag.name}</span>
+            <span className="tag-preview-pill tag-chip" style={{ "--tag-color": tag.color }}>{tag.name}</span>
             <button className="icon-btn icon-btn--ghost" title="Edit tag" onClick={() => startEdit(tag)}>✎</button>
             <button className="icon-btn icon-btn--danger icon-btn--ghost" title="Delete tag" onClick={() => onDelete(tag.id)}>🗑</button>
           </div>

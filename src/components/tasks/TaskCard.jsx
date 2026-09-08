@@ -72,7 +72,7 @@ export function TaskCard({ task, tags, onUpdate, onDelete, onEdit, onMarkDone })
                 </span>
               )}
               {taskTags.map(tag => (
-                <span key={tag.id} className="task-tag-pill" style={{ background: tag.color + "29", color: tag.color, border: `1px solid ${tag.color}66` }}>{tag.name}</span>
+                <span key={tag.id} className="task-tag-pill tag-chip" style={{ "--tag-color": tag.color }}>{tag.name}</span>
               ))}
             </div>
           )}
@@ -127,7 +127,7 @@ export function TaskCard({ task, tags, onUpdate, onDelete, onEdit, onMarkDone })
                         {subtaskTags.length > 0 && (
                           <div className="task-card__subtask-tags">
                             {subtaskTags.map(tag => (
-                              <span key={tag.id} className="task-tag-pill" style={{ background: tag.color + "29", color: tag.color, border: `1px solid ${tag.color}66`, fontSize: 9 }}>{tag.name}</span>
+                              <span key={tag.id} className="task-tag-pill tag-chip" style={{ "--tag-color": tag.color, fontSize: 9 }}>{tag.name}</span>
                             ))}
                           </div>
                         )}
@@ -140,9 +140,9 @@ export function TaskCard({ task, tags, onUpdate, onDelete, onEdit, onMarkDone })
                         {tags.map(tag => (
                           <button
                             key={tag.id}
-                            className="tag-pill"
+                            className={`tag-pill tag-chip tag-chip--button${(subtask.tags || []).includes(tag.id) ? " tag-chip--on" : ""}`}
                             onClick={() => toggleSubtaskTag(subtask.id, tag.id)}
-                            style={{ borderColor: tag.color, color: tag.color, background: (subtask.tags || []).includes(tag.id) ? tag.color + "22" : "transparent", fontSize: 10, padding: "3px 9px" }}
+                            style={{ "--tag-color": tag.color, fontSize: 10, padding: "3px 9px" }}
                           >
                             {(subtask.tags || []).includes(tag.id) && "✓ "}{tag.name}
                           </button>

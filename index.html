@@ -6,17 +6,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>taskflow</title>
     <!--
-      Set the theme attribute before first paint so reloading (or switching
-      to/from the light "Daylight" theme) doesn't flash the wrong colors.
-      Keep the storage key below in sync with THEME_STORAGE_KEY in
-      src/constants/storage.js.
+      Resolve the theme before first paint so a reload never flashes the wrong
+      palette or a white screen in dark mode. Mirrors src/hooks/useTheme.js —
+      keep the storage keys, palette list and migration in sync with
+      src/constants/storage.js and src/constants/themes.js.
     -->
     <script>
       (function () {
+        var root = document.documentElement;
         try {
-          var theme = localStorage.getItem("todo_mgr_theme_v1");
-          document.documentElement.dataset.theme = theme || "midnight";
-        } catch (e) {}
+          var PALETTES = ["midnight", "ocean", "forest", "sunset"];
+          var palette = localStorage.getItem("todo_mgr_theme_v1");
+          var mode = localStorage.getItem("todo_mgr_theme_mode_v1");
+
+          if (!mode) {
+            // Pre-v2 single-value setting, or a brand new visitor.
+            if (palette === "daylight") { palette = "midnight"; mode = "light"; }
+            else if (PALETTES.indexOf(palette) !== -1) { mode = "dark"; }
+            else { mode = "system"; }
+          }
+          if (PALETTES.indexOf(palette) === -1) palette = "midnight";
+
+          root.dataset.theme = palette;
+          root.dataset.mode = mode === "system"
+            ? (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")
+            : mode;
+        } catch (e) {
+          root.dataset.theme = "midnight";
+          root.dataset.mode = "dark";
+        }
       })();
     </script>
   </head>

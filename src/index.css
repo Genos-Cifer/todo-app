@@ -3,50 +3,176 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body,#root{height:100%;background:var(--color-bg)}
 
+/*
+ * Colors are DERIVED, not hand-picked.
+ *
+ *   palette (hue + saturation)  ×  mode (the lightness ramp)  =  every token
+ *
+ * A palette in styles/themes.css sets only a handful of knobs (--h, --sat-*,
+ * --accent-h…). The mode blocks below set only lightnesses (--l-*). Every
+ * --color-* formula lives here, once, so surfaces, borders, text, shadows and
+ * status colors all pick up a palette's hue automatically — which is what
+ * makes switching palettes repaint the whole app rather than just the icons.
+ *
+ * Custom properties resolve at use time, so a formula declared here picks up
+ * whichever mode/palette value wins the cascade on <html>.
+ */
 :root{
-  /* Surfaces */
-  --color-bg:#0f0f14;
-  --color-bg-alt:#15151d;
-  --color-bg-inset:#1a1a25;
-  --color-surface-1:#1f1f2e;
-  --color-surface-2:#272738;
-  --color-surface-3:#2f2f42;
-  --color-surface-4:#383850;
+  /* ── Palette knobs (overridden per [data-theme], see styles/themes.css) ── */
+  --h:258;              /* surface / chrome hue */
+  --sat-surface:24%;    /* how strongly surfaces carry that hue */
+  --sat-text:16%;       /* text is tinted more gently than surfaces */
+  --accent-h:262;
+  --accent-s:92%;
+  --accent-l-shift:0%;   /* palette nudge, respected by both mode ramps */
 
-  /* Borders */
-  --color-border-subtle:rgba(255,255,255,0.07);
-  --color-border-default:rgba(255,255,255,0.14);
-  --color-border-strong:rgba(255,255,255,0.24);
-  /* Solid (non-alpha) border for controls that must stay visible regardless of
-     what surface they sit on — e.g. checkboxes that appear on both card and
-     inset backgrounds. Meets ~3:1 contrast against --color-surface-1/--color-bg-inset. */
-  --color-border-interactive:#6f6b88;
+  /* Priority hues stay semantic (red → green) across palettes, but a palette
+     may nudge one aside when it would collide with its own accent. */
+  --priority-very-high-h:0;
+  --priority-high-h:25;
+  --priority-medium-h:43;
+  --priority-low-h:160;
 
-  /* Text */
-  --color-text-primary:#f0eef8;
-  --color-text-secondary:#a09cb5;
-  --color-text-tertiary:#8783a0;
+  /* ── Mode knobs (dark is the default; [data-mode="light"] overrides) ── */
+  --l-bg:6%;
+  --l-bg-alt:9%;
+  --l-bg-inset:11%;
+  --l-surface-1:14%;
+  --l-surface-2:18.5%;
+  --l-surface-3:23%;
+  --l-surface-4:30%;
 
-  /* Accent / status
-     "-rgb" variants hold the same color as an "r,g,b" triplet so glows/shadows
-     elsewhere can do rgba(var(--color-accent-rgb), alpha) and stay in sync when
-     a theme swaps the accent hue (see styles/themes.css). */
-  --color-accent:#a78bfa;
-  --color-accent-light:#c4b5fd;
-  --color-accent-dark:#7c3aed;
-  --color-accent-rgb:167,139,250;
-  --color-danger:#f87171;
-  --color-danger-rgb:248,113,113;
-  --color-success:#34d399;
-  --color-success-rgb:52,211,153;
+  --l-text-1:96%;
+  --l-text-2:73%;
+  --l-text-3:59%;
 
-  /* Shape & motion */
+  --border-l:88%;
+  --border-s:45%;
+  --a-border-subtle:0.10;
+  --a-border-default:0.18;
+  --a-border-strong:0.30;
+  --s-border-interactive:16%;
+  --l-border-interactive:56%;
+
+  --l-accent-base:72%;
+  --l-accent:calc(var(--l-accent-base) + var(--accent-l-shift));
+  --l-danger:71%;
+  --l-success:51%;
+  --l-priority:68%;
+  --accent-dark-offset:32%;
+
+  --shadow-hue-l:3%;
+  --shadow-hue-s:60%;
+  --a-shadow-sm:0.55;
+  --a-shadow-lg:0.7;
+
+  /* Tag pills carry user-chosen colors, which are picked against dark
+     surfaces. In light mode the ink is mixed toward near-black so a pale
+     yellow tag stays readable on white. */
+  --tag-ink-pct:100%;
+  --tag-ink-base:transparent;
+  --tag-bg-pct:16%;
+  --tag-border-pct:40%;
+
+  /* Strength of the ambient accent wash behind the app shell. */
+  --app-glow-pct:10%;
+
+  /* ── Derived surfaces ── */
+  --color-bg:hsl(var(--h) var(--sat-surface) var(--l-bg));
+  --color-bg-alt:hsl(var(--h) var(--sat-surface) var(--l-bg-alt));
+  --color-bg-inset:hsl(var(--h) var(--sat-surface) var(--l-bg-inset));
+  --color-surface-1:hsl(var(--h) var(--sat-surface) var(--l-surface-1));
+  --color-surface-2:hsl(var(--h) var(--sat-surface) var(--l-surface-2));
+  --color-surface-3:hsl(var(--h) var(--sat-surface) var(--l-surface-3));
+  --color-surface-4:hsl(var(--h) var(--sat-surface) var(--l-surface-4));
+
+  /* ── Derived borders ── */
+  --color-border-subtle:hsl(var(--h) var(--border-s) var(--border-l) / var(--a-border-subtle));
+  --color-border-default:hsl(var(--h) var(--border-s) var(--border-l) / var(--a-border-default));
+  --color-border-strong:hsl(var(--h) var(--border-s) var(--border-l) / var(--a-border-strong));
+  /* Solid (non-alpha) border for controls that must stay visible on any
+     surface — e.g. checkboxes that appear on both card and inset backgrounds. */
+  --color-border-interactive:hsl(var(--h) var(--s-border-interactive) var(--l-border-interactive));
+
+  /* ── Derived text ── */
+  --color-text-primary:hsl(var(--h) var(--sat-text) var(--l-text-1));
+  --color-text-secondary:hsl(var(--h) var(--sat-text) var(--l-text-2));
+  --color-text-tertiary:hsl(var(--h) var(--sat-text) var(--l-text-3));
+
+  /* ── Derived accent & status ── */
+  --color-accent:hsl(var(--accent-h) var(--accent-s) var(--l-accent));
+  --color-accent-light:hsl(var(--accent-h) var(--accent-s) calc(var(--l-accent) + 12%));
+  --color-accent-dark:hsl(var(--accent-h) calc(var(--accent-s) * 0.82) calc(var(--l-accent) - var(--accent-dark-offset)));
+  --color-danger:hsl(0 84% var(--l-danger));
+  --color-success:hsl(160 64% var(--l-success));
+
+  /* ── Derived priority colors (themeable, unlike the old hardcoded hexes) ── */
+  --color-priority-very-high:hsl(var(--priority-very-high-h) 84% var(--l-priority));
+  --color-priority-high:hsl(var(--priority-high-h) 92% var(--l-priority));
+  --color-priority-medium:hsl(var(--priority-medium-h) 90% var(--l-priority));
+  --color-priority-low:hsl(var(--priority-low-h) 62% var(--l-priority));
+  --color-priority-very-high-bg:hsl(var(--priority-very-high-h) 84% var(--l-priority) / 0.14);
+  --color-priority-high-bg:hsl(var(--priority-high-h) 92% var(--l-priority) / 0.14);
+  --color-priority-medium-bg:hsl(var(--priority-medium-h) 90% var(--l-priority) / 0.14);
+  --color-priority-low-bg:hsl(var(--priority-low-h) 62% var(--l-priority) / 0.14);
+
+  /* ── Shape, shadow & motion ── */
   --radius-lg:14px;
   --radius-md:10px;
   --radius-sm:6px;
-  --shadow-sm:0 4px 24px rgba(0,0,0,0.4);
-  --shadow-lg:0 12px 48px rgba(0,0,0,0.6);
+  --shadow-color:hsl(var(--h) var(--shadow-hue-s) var(--shadow-hue-l));
+  --shadow-sm:0 4px 24px hsl(var(--h) var(--shadow-hue-s) var(--shadow-hue-l) / var(--a-shadow-sm));
+  --shadow-lg:0 12px 48px hsl(var(--h) var(--shadow-hue-s) var(--shadow-hue-l) / var(--a-shadow-lg));
   --transition-base:0.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Light mode: same formulas, inverted lightness ramp. */
+:root[data-mode="light"]{
+  --l-bg:96.5%;
+  --l-bg-alt:100%;
+  --l-bg-inset:93.5%;
+  --l-surface-1:100%;
+  --l-surface-2:96%;
+  --l-surface-3:90.5%;
+  --l-surface-4:83%;
+
+  --l-text-1:13%;
+  --l-text-2:33%;
+  --l-text-3:45%;
+
+  --border-l:22%;
+  --border-s:35%;
+  --a-border-subtle:0.08;
+  --a-border-default:0.15;
+  --a-border-strong:0.28;
+  --s-border-interactive:14%;
+  --l-border-interactive:45%;
+
+  --l-accent-base:47%;
+  --l-danger:48%;
+  --l-success:33%;
+  --l-priority:30%;
+  --accent-dark-offset:20%;
+
+  --shadow-hue-l:35%;
+  --shadow-hue-s:35%;
+  --a-shadow-sm:0.12;
+  --a-shadow-lg:0.2;
+
+  --tag-ink-pct:55%;
+  --tag-ink-base:hsl(var(--h) 30% 12%);
+  --tag-bg-pct:14%;
+  --tag-border-pct:34%;
+
+  --app-glow-pct:16%;
+}
+
+/* Briefly applied by useTheme while switching, so palettes cross-fade instead
+   of hard-flipping. Removed again once the transition has run. */
+:root[data-theme-switching] *,
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after{
+  transition:background-color 0.32s ease,border-color 0.32s ease,color 0.32s ease,box-shadow 0.32s ease,fill 0.32s ease,stroke 0.32s ease !important;
 }
 
 /* Shared entrance animations reused across several components. */
